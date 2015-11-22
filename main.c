@@ -36,6 +36,7 @@
 #include "bicycle.h"
 #include "diamond.h"
 #include "tetrahedron.h"
+#include "cone.h"
 
 int axes=1;       //  Display axes
 int mode=1;       //  Projection mode
@@ -149,11 +150,14 @@ void display()
    //frontPiece(0,0,0, 0,0,0, 1,1,1);
    //body(0,0,0, 0,0,0, 1,1,1);
    //bicycle(0,0,0, 0,0,0, 1,1,1);
+   /*
    tetrahedron(1,0,0,
 	       0,1,0,
 	       0,0,1,
 	       1,1,0);
+   */
    //diamond(0,0,0, 0,0,0, 1,1,1);
+   cone(0,0,0, 0,0,0, 1,1,1);
    //  Draw axes - no lighting from here on
    glDisable(GL_LIGHTING);
    glColor3f(1,1,1);
