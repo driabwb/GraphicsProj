@@ -40,12 +40,13 @@ torus.o: torus.c torus.h CSCIx229.h
 cylinder.o: cylinder.c cylinder.h CSCIx229.h
 bicycle.o: bicycle.h bicycle.c cylinder.o torus.o
 diamond.o: diamond.h diamond.c CSCIx229.h
+tetrahedron.o: tetrahedron.h tetrahedron.c CSCIx229.h
 
 #  Create archive
 CSCIx229.a:fatal.o loadtexbmp.o print.o project.o errcheck.o object.o
 	ar -rcs $@ $^
 
-objects.a:cube.o sphere.o triangularPrism.o tear.o torus.o cylinder.o bicycle.o diamond.o
+objects.a:cube.o sphere.o triangularPrism.o tear.o torus.o cylinder.o bicycle.o diamond.o tetrahedron.o
 	ar -rcs $@ $^
 
 # Compile rules
@@ -55,7 +56,7 @@ objects.a:cube.o sphere.o triangularPrism.o tear.o torus.o cylinder.o bicycle.o 
 	g++ -c $(CFLG) $<
 
 #  Link
-main:main.o CSCIx229.a objects.a
+main:main.o CSCIx229.a objects.a world.o
 	gcc -O3 -o $@ $^   $(LIBS)
 
 #  Clean
