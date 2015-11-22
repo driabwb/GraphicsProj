@@ -32,8 +32,20 @@ project.o: project.c CSCIx229.h
 errcheck.o: errcheck.c CSCIx229.h
 object.o: object.c CSCIx229.h
 
+sphere.o: sphere.c sphere.h CSCIx229.h
+cube.o: cube.c cube.h CSCIx229.h
+triangularPrism.o: triangularPrism.c triangularPrism.h CSCIx229.h
+tear.o: tear.c tear.h CSCIx229.h
+torus.o: torus.c torus.h CSCIx229.h
+cylinder.o: cylinder.c cylinder.h CSCIx229.h
+bicycle.o: bicycle.h bicycle.c cylinder.o torus.o
+diamond.o: diamond.h diamond.c CSCIx229.h
+
 #  Create archive
 CSCIx229.a:fatal.o loadtexbmp.o print.o project.o errcheck.o object.o
+	ar -rcs $@ $^
+
+objects.a:cube.o sphere.o triangularPrism.o tear.o torus.o cylinder.o bicycle.o diamond.o
 	ar -rcs $@ $^
 
 # Compile rules
@@ -43,7 +55,7 @@ CSCIx229.a:fatal.o loadtexbmp.o print.o project.o errcheck.o object.o
 	g++ -c $(CFLG) $<
 
 #  Link
-main:main.o CSCIx229.a
+main:main.o CSCIx229.a objects.a
 	gcc -O3 -o $@ $^   $(LIBS)
 
 #  Clean

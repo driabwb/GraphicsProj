@@ -26,6 +26,16 @@
  */
 #include "CSCIx229.h"
 
+// Shapes
+#include "cube.h"
+#include "sphere.h"
+#include "triangularPrism.h"
+#include "tear.h"
+#include "torus.h"
+#include "cylinder.h"
+#include "bicycle.h"
+#include "diamond.h"
+
 int axes=1;       //  Display axes
 int mode=1;       //  Projection mode
 int move=1;       //  Move light
@@ -52,279 +62,9 @@ float ylight  =   0;  // Elevation of light
 
 int i=0, o=0, p=0;
 
-/*
- *  Draw a cube
- *     at (x,y,z)
- *     dimentions (dx,dy,dz)
- *     rotated th about the y axis
- */
-static void cube(double x,double y,double z,
-                 double dx,double dy,double dz,
-                 double th)
-{
-   //  Set specular color to white
-   float white[] = {1,1,1,1};
-   float black[] = {0,0,0,1};
-   glMaterialfv(GL_FRONT_AND_BACK,GL_SHININESS,shinyvec);
-   glMaterialfv(GL_FRONT_AND_BACK,GL_SPECULAR,white);
-   glMaterialfv(GL_FRONT_AND_BACK,GL_EMISSION,black);
-   //  Save transformation
-   glPushMatrix();
-   //  Offset, scale and rotate
-   glTranslated(x,y,z);
-   glRotated(th,0,1,0);
-   glScaled(dx,dy,dz);
-   //  Cube
-   glBegin(GL_QUADS);
-   //  Front
-   glColor3f(1,0,0);
-   glNormal3f( 0, 0, 1);
-   glVertex3f(-1,-1, 1);
-   glVertex3f(+1,-1, 1);
-   glVertex3f(+1,+1, 1);
-   glVertex3f(-1,+1, 1);
-   //  Back
-   glColor3f(0,0,1);
-   glNormal3f( 0, 0,-1);
-   glVertex3f(+1,-1,-1);
-   glVertex3f(-1,-1,-1);
-   glVertex3f(-1,+1,-1);
-   glVertex3f(+1,+1,-1);
-   //  Right
-   glColor3f(1,1,0);
-   glNormal3f(+1, 0, 0);
-   glVertex3f(+1,-1,+1);
-   glVertex3f(+1,-1,-1);
-   glVertex3f(+1,+1,-1);
-   glVertex3f(+1,+1,+1);
-   //  Left
-   glColor3f(0,1,0);
-   glNormal3f(-1, 0, 0);
-   glVertex3f(-1,-1,-1);
-   glVertex3f(-1,-1,+1);
-   glVertex3f(-1,+1,+1);
-   glVertex3f(-1,+1,-1);
-   //  Top
-   glColor3f(0,1,1);
-   glNormal3f( 0,+1, 0);
-   glVertex3f(-1,+1,+1);
-   glVertex3f(+1,+1,+1);
-   glVertex3f(+1,+1,-1);
-   glVertex3f(-1,+1,-1);
-   //  Bottom
-   glColor3f(1,0,1);
-   glNormal3f( 0,-one, 0);
-   glVertex3f(-1,-1,-1);
-   glVertex3f(+1,-1,-1);
-   glVertex3f(+1,-1,+1);
-   glVertex3f(-1,-1,+1);
-   //  End
-   glEnd();
-   //  Undo transofrmations
-   glPopMatrix();
-}
 
-/*
- *  Draw vertex in polar coordinates with normal
- */
-static void Vertex(double th,double ph)
-{
-   double x = Sin(th)*Cos(ph);
-   double y = Cos(th)*Cos(ph);
-   double z =         Sin(ph);
-   //  For a sphere at the origin, the position
-   //  and normal vectors are the same
-   glNormal3d(x,y,z);
-   glVertex3d(x,y,z);
-}
 
-/*
- *  Draw a ball
- *     at (x,y,z)
- *     radius (r)
- */
-static void ball(double x,double y,double z,double r)
-{
-   int th,ph;
-   float yellow[] = {1.0,1.0,0.0,1.0};
-   float Emission[]  = {0.0,0.0,0.01*emission,1.0};
-   //  Save transformation
-   glPushMatrix();
-   //  Offset, scale and rotate
-   glTranslated(x,y,z);
-   glScaled(r,r,r);
-   //  White ball
-   glColor3f(1,1,1);
-   glMaterialfv(GL_FRONT,GL_SHININESS,shinyvec);
-   glMaterialfv(GL_FRONT,GL_SPECULAR,yellow);
-   glMaterialfv(GL_FRONT,GL_EMISSION,Emission);
-   //  Bands of latitude
-   for (ph=-90;ph<90;ph+=inc)
-   {
-      glBegin(GL_QUAD_STRIP);
-      for (th=0;th<=360;th+=2*inc)
-      {
-         Vertex(th,ph);
-         Vertex(th,ph+inc);
-      }
-      glEnd();
-   }
-   //  Undo transofrmations
-   glPopMatrix();
-}
 
-/*
- * Draw a triangular prism
- *     at (x,y,z)
- *     scaled to (dx,dy,dz)
- *
- */
-
-static void triangularPrism(double x, double y, double z,
-			    double dx, double dy, double dz)
-{
-  // Save Transform
-  glPushMatrix();
-  // Offset
-  glTranslated(x,y,z);
-  glScaled(dx,dy,dz);
-
-  //End Triangles
-  glBegin(GL_TRIANGLES);
-  glColor3f(1,0,0);
-  glNormal3d(1,0,0);
-  glVertex3f(1,-1,0);
-  glVertex3f(1,1,0);
-  glVertex3f(1,0.5,1);
-  glEnd();
-  glBegin(GL_TRIANGLES);
-  glNormal3d(-1,0,0);
-  glColor3f(0,1,0);
-  glVertex3f(-1,0.5,1);
-  glVertex3f(-1,1,0);
-  glVertex3f(-1,-1,0);
-  glEnd();
-
-  // Sides
-  glBegin(GL_QUADS);
-  // Side 1
-  glNormal3d(0,2,1);
-  glColor3f(0,0,1);
-  glVertex3f(1,1,0);
-  glVertex3f(-1,1,0);
-  glVertex3f(-1,0.5,1);
-  glVertex3f(1,0.5,1);
-  // Side 2
-  glNormal3d(0,-2,3);
-  glColor3f(0,1,0);
-  glVertex3f(-1,0.5,1);
-  glVertex3f(-1,-1,0);
-  glVertex3f(1,-1,0);
-  glVertex3f(1,0.5,1);
-  // Side 3
-  glNormal3d(0,0,-4);
-  glColor3f(1,0,0);
-  glVertex3f(1,1,0);
-  glVertex3f(1,-1,0);
-  glVertex3f(-1,-1,0);
-  glVertex3f(-1,1,0);
-  glEnd();
-
-  // Undo transformations
-  glPopMatrix();
-}
-
-/*
- *  Draw vertex in polar coordinates
- */
-static void tearVertex(double th,double ph)
-{
-  glColor3f(1,0,0);
-  //glColor3f(Cos(th)*Cos(th) , Sin(ph)*Sin(ph) , Sin(th)*Sin(th));
-  glVertex3d(Cos(th) ,
-	     Sin(th)*pow(Sin(th/2),4.0)*Sin(ph) ,
-	     Sin(th)*pow(Sin(th/2),4.0)*Cos(ph));
-}
-
-static void tearNormal(double th, double ph)
-{
-  glNormal3d(1*pow(Sin(th/2),9)*(7*Cos(th/2)+3*Cos(3*th/2)),
-	     1*pow(Sin(th/2),4)*pow(Sin(th),2)*Sin(ph),
-	     1*Cos(ph)*pow(Sin(th/2),4)*pow(Sin(th),2));
-}
-
-/*
- *  Draw a tear drop 
- *     at (x,y,z)
- *     radius (r)
- *     rotated (rx, ry, rz)
- */
-static void tear(double x,double y,double z,double r,
-		 double rx, double ry, double rz)
-{
-   const int d=10;
-   int th,ph;
-
-   //  Set specular color to white
-   float white[] = {1,1,1,1};
-   float black[] = {0,0,0,1};
-   
-   glMaterialfv(GL_FRONT_AND_BACK,GL_SHININESS,shinyvec);
-   glMaterialfv(GL_FRONT_AND_BACK,GL_SPECULAR,white);
-   glMaterialfv(GL_FRONT_AND_BACK,GL_EMISSION,black);
-   
-   
-   //  Save transformation
-   glPushMatrix();
-   //  Offset and scale
-   glTranslated(x,y,z);
-
-   /* Unimplemented feature, create transformation based upon rx,ry,rz not compound transform */
-   glRotated(rx, 1,0,0);
-   glRotated(ry, 0,Cos(rx),Sin(rx));
-   glRotated(rz, Sin(ry),Sin(rx),Cos(rx)*Cos(ry));
-   
-   glScaled(r,r,r);
-
-   //  Top
-   glBegin(GL_TRIANGLE_FAN);
-   tearNormal(0,0);
-   tearVertex(0,0);
-   for (th=0;th<180;th+=d)
-   {
-     tearNormal(d,th);
-     tearVertex(d,th);
-   }
-   glEnd();
-   
-   //  Latitude bands
-   for (ph=d;ph<=360;ph+=d)
-   {
-     glBegin(GL_QUAD_STRIP);
-     for (th=0;th<=360;th+=d)
-     {
-       tearNormal(th,ph);
-       tearVertex(th,ph);
-       tearNormal(th,ph+d);
-       tearVertex(th,ph+d);
-	 }
-      glEnd();
-   }
-
-   //  Bottom
-   glBegin(GL_TRIANGLE_FAN);
-   tearNormal(360,360);
-   tearVertex(360,360);
-   for (th=0;th<360;th+=d)
-   {
-     tearNormal(360-d,th);
-     tearVertex(360-d,th);
-   }
-   glEnd();
-
-   //  Undo transformations
-   glPopMatrix();
-}
 
 
 
@@ -368,7 +108,7 @@ void display()
    float Position[]  = {distance*Cos(zh),ylight,distance*Sin(zh),1.0};
    //  Draw light position as ball (still no lighting here)
    glColor3f(1,1,1);
-   ball(Position[0],Position[1],Position[2] , 0.1);
+   sphere(Position[0],Position[1],Position[2] , 0.1, shinyvec, emission);
    //  OpenGL should normalize normal vectors
    glEnable(GL_NORMALIZE);
    //  Enable lighting
@@ -388,15 +128,27 @@ void display()
    
 
    //  Draw scene
-   cube(0,0,0 , 0.1,0.1,0.1 , 0);
-   tear(0,0,1, 0.5, 0,90,0);
-   tear(1,0,0 , 0.2, 0,0,0);
-   tear(0,1,0 , 0.2, 0,0,90);
-   tear(0,1,1 , 0.2, 0,90,90);
-   triangularPrism(1,1,1, 0.2,0.1,0.3);
-   tear(-1,-1,-1 , 0.2, i,o,p);
-   
-   
+   /*
+     cube(0,0,0 , 0.1,0.1,0.1 , 0, shinyvec);
+     tear(0,0,1, 0.5, 0,90,0, shinyvec);
+     tear(1,0,0 , 0.2, 0,0,0, shinyvec);
+     tear(0,1,0 , 0.2, 0,0,90, shinyvec);
+     tear(0,1,1 , 0.2, 0,90,90, shinyvec);
+     triangularPrism(1,1,1, 0.2,0.1,0.3, shinyvec);
+     tear(-1,-1,-1 , 0.2, i,o,p, shinyvec);
+     torus(-1,1,1, 0.5,0.1, 0,0,0, 0.5,0.5,0.5, 20);
+     cylinder(0,0,0, 0.5,0.5, 0,0,0, 1,1,1);
+   */
+   //   wheel(0,0,0, 0.5);
+   //partialTorus(0,0,0, 0.5,0.1, 0,0,0, 0.5,0.5,0.5, 20, 46);
+   //pedal(0,0,0,0);
+   //halfHandleBar(0,0,0, 0,0,0, 1,1,1);
+   //halfHandleBar(0,0,0, 0,180,0, 1,1,1);
+   //frontFork(0,0,0, 0,0,0, 1,1,1, 4, 2, 3);
+   //frontPiece(0,0,0, 0,0,0, 1,1,1);
+   //body(0,0,0, 0,0,0, 1,1,1);
+   bicycle(0,0,0, 0,0,0, 1,1,1);
+   //diamond(0,0,0, 0,0,0, 1,1,1);
    //  Draw axes - no lighting from here on
    glDisable(GL_LIGHTING);
    glColor3f(1,1,1);
