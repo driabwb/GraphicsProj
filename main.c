@@ -37,6 +37,9 @@
 #include "diamond.h"
 #include "tetrahedron.h"
 #include "cone.h"
+#include "world.h"
+
+const int FIRST_PERSON = 2;
 
 int axes=1;       //  Display axes
 int mode=1;       //  Projection mode
@@ -130,34 +133,9 @@ void display()
    
 
    //  Draw scene
-   /*
-     cube(0,0,0 , 0.1,0.1,0.1 , 0, shinyvec);
-     tear(0,0,1, 0.5, 0,90,0, shinyvec);
-     tear(1,0,0 , 0.2, 0,0,0, shinyvec);
-     tear(0,1,0 , 0.2, 0,0,90, shinyvec);
-     tear(0,1,1 , 0.2, 0,90,90, shinyvec);
-     triangularPrism(1,1,1, 0.2,0.1,0.3, shinyvec);
-     tear(-1,-1,-1 , 0.2, i,o,p, shinyvec);
-     torus(-1,1,1, 0.5,0.1, 0,0,0, 0.5,0.5,0.5, 20);
-     cylinder(0,0,0, 0.5,0.5, 0,0,0, 1,1,1);
-   */
-   //   wheel(0,0,0, 0.5);
-   //partialTorus(0,0,0, 0.5,0.1, 0,0,0, 0.5,0.5,0.5, 20, 46);
-   //pedal(0,0,0,0);
-   //halfHandleBar(0,0,0, 0,0,0, 1,1,1);
-   //halfHandleBar(0,0,0, 0,180,0, 1,1,1);
-   //frontFork(0,0,0, 0,0,0, 1,1,1, 4, 2, 3);
-   //frontPiece(0,0,0, 0,0,0, 1,1,1);
-   //body(0,0,0, 0,0,0, 1,1,1);
-   //bicycle(0,0,0, 0,0,0, 1,1,1);
-   /*
-   tetrahedron(1,0,0,
-	       0,1,0,
-	       0,0,1,
-	       1,1,0);
-   */
-   //diamond(0,0,0, 0,0,0, 1,1,1);
-   cone(0,0,0, 0,0,0, 1,1,1);
+   drawStaticWorld();
+   drawDynamicWorld();
+
    //  Draw axes - no lighting from here on
    glDisable(GL_LIGHTING);
    glColor3f(1,1,1);
@@ -215,45 +193,49 @@ void idle()
  */
 void special(int key,int x,int y)
 {
-   //  Right arrow key - increase angle by 5 degrees
-   if (key == GLUT_KEY_RIGHT)
+  if(mode == FIRST_PERSON){
+    // Turn character right
+    if (key == GLUT_KEY_RIGHT)
       th += 5;
-   //  Left arrow key - decrease angle by 5 degrees
-   else if (key == GLUT_KEY_LEFT)
+    // Turn character left
+    else if (key == GLUT_KEY_LEFT)
       th -= 5;
-   //  Up arrow key - increase elevation by 5 degrees
-   else if (key == GLUT_KEY_UP)
+    //  Move forward
+    else if (key == GLUT_KEY_UP)
       ph += 5;
-   //  Down arrow key - decrease elevation by 5 degrees
-   else if (key == GLUT_KEY_DOWN)
+    //  Move backward
+    else if (key == GLUT_KEY_DOWN)
       ph -= 5;
-   //  PageUp key - increase dim
-   else if (key == GLUT_KEY_PAGE_DOWN)
+    
+
+  }
+  else{
+    //  Right arrow key - increase angle by 5 degrees
+    if (key == GLUT_KEY_RIGHT)
+      th += 5;
+    //  Left arrow key - decrease angle by 5 degrees
+    else if (key == GLUT_KEY_LEFT)
+      th -= 5;
+    //  Up arrow key - increase elevation by 5 degrees
+    else if (key == GLUT_KEY_UP)
+      ph += 5;
+    //  Down arrow key - decrease elevation by 5 degrees
+    else if (key == GLUT_KEY_DOWN)
+      ph -= 5;
+    //  PageUp key - increase dim
+    else if (key == GLUT_KEY_PAGE_DOWN)
       dim += 0.1;
-   //  PageDown key - decrease dim
-   else if (key == GLUT_KEY_PAGE_UP && dim>1)
+    //  PageDown key - decrease dim
+    else if (key == GLUT_KEY_PAGE_UP && dim>1)
       dim -= 0.1;
-   //  Smooth color model
-   else if (key == GLUT_KEY_F1)
-      smooth = 1-smooth;
-   //  Local Viewer
-   else if (key == GLUT_KEY_F2)
-      local = 1-local;
-   else if (key == GLUT_KEY_F3)
-      distance = (distance==1) ? 5 : 1;
-   //  Toggle ball increment
-   else if (key == GLUT_KEY_F8)
-      inc = (inc==10)?3:10;
-   //  Flip sign
-   else if (key == GLUT_KEY_F9)
-      one = -one;
-   //  Keep angles to +/-360 degrees
-   th %= 360;
-   ph %= 360;
-   //  Update projection
-   Project(mode?fov:0,asp,dim);
-   //  Tell GLUT it is necessary to redisplay the scene
-   glutPostRedisplay();
+  }
+  //  Keep angles to +/-360 degrees
+  th %= 360;
+  ph %= 360;
+  //  Update projection
+  Project(mode?fov:0,asp,dim);
+  //  Tell GLUT it is necessary to redisplay the scene
+  glutPostRedisplay();
 }
 
 /*

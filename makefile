@@ -16,11 +16,11 @@ CFLG=-O3 -Wall -Wno-deprecated-declarations
 LIBS=-framework GLUT -framework OpenGL
 #  Linux/Unix/Solaris
 else
-CFLG=-O0 -Wall -g
+CFLG=-O3 -Wall -g
 LIBS=-lglut -lGLU -lGL -lm
 endif
 #  OSX/Linux/Unix/Solaris
-CLEAN=rm -f $(EXE) *.o *.a *~
+CLEAN=rm -f $(EXE) *.o *.a *~ *.gch
 endif
 
 # Dependencies
@@ -43,12 +43,15 @@ diamond.o: diamond.h diamond.c CSCIx229.h
 tetrahedron.o: tetrahedron.h tetrahedron.c CSCIx229.h
 cone.o: cone.h cone.c CSCIx229.h
 
+world.o: world.c world.h CSCIx229.h cube.o sphere.o triangularPrism.o tear.o torus.o cylinder.o bicycle.o diamond.o tetrahedron.o \
+	cone.o
+
 #  Create archive
 CSCIx229.a:fatal.o loadtexbmp.o print.o project.o errcheck.o object.o
 	ar -rcs $@ $^
 
 objects.a:cube.o sphere.o triangularPrism.o tear.o torus.o cylinder.o bicycle.o diamond.o tetrahedron.o \
-	cone.o
+	cone.o world.o
 	ar -rcs $@ $^
 
 # Compile rules
@@ -58,7 +61,8 @@ objects.a:cube.o sphere.o triangularPrism.o tear.o torus.o cylinder.o bicycle.o 
 	g++ -c $(CFLG) $<
 
 #  Link
-main:main.o CSCIx229.a objects.a world.o
+
+main:main.o CSCIx229.a objects.a
 	gcc -O3 -o $@ $^   $(LIBS)
 
 #  Clean
