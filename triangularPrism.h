@@ -9,8 +9,9 @@
  */
 
 void triangularPrism(double x, double y, double z,
-			    double dx, double dy, double dz,
-			    float* shinyvec);
+		     double rx, double ry, double rz,
+		     double dx, double dy, double dz,
+		     float* shinyvec);
 
 
 #endif
