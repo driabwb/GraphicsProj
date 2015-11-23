@@ -11,7 +11,7 @@
  */
 void cube(double x,double y,double z,
                  double dx,double dy,double dz,
-                 double th, float* shinyvec)
+                 double th, const float const * shinyvec)
 {
    //  Set specular color to white
    float white[] = {1,1,1,1};
@@ -28,42 +28,36 @@ void cube(double x,double y,double z,
    //  Cube
    glBegin(GL_QUADS);
    //  Front
-   glColor3f(1,0,0);
    glNormal3f( 0, 0, 1);
    glVertex3f(-1,-1, 1);
    glVertex3f(+1,-1, 1);
    glVertex3f(+1,+1, 1);
    glVertex3f(-1,+1, 1);
    //  Back
-   glColor3f(0,0,1);
    glNormal3f( 0, 0,-1);
    glVertex3f(+1,-1,-1);
    glVertex3f(-1,-1,-1);
    glVertex3f(-1,+1,-1);
    glVertex3f(+1,+1,-1);
    //  Right
-   glColor3f(1,1,0);
    glNormal3f(+1, 0, 0);
    glVertex3f(+1,-1,+1);
    glVertex3f(+1,-1,-1);
    glVertex3f(+1,+1,-1);
    glVertex3f(+1,+1,+1);
    //  Left
-   glColor3f(0,1,0);
    glNormal3f(-1, 0, 0);
    glVertex3f(-1,-1,-1);
    glVertex3f(-1,-1,+1);
    glVertex3f(-1,+1,+1);
    glVertex3f(-1,+1,-1);
    //  Top
-   glColor3f(0,1,1);
    glNormal3f( 0,+1, 0);
    glVertex3f(-1,+1,+1);
    glVertex3f(+1,+1,+1);
    glVertex3f(+1,+1,-1);
    glVertex3f(-1,+1,-1);
    //  Bottom
-   glColor3f(1,0,1);
    glNormal3f( 0,-1, 0);
    glVertex3f(-1,-1,-1);
    glVertex3f(+1,-1,-1);
