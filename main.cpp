@@ -101,13 +101,17 @@ void display()
 
    //  Flat or smooth shading
    glShadeModel(smooth ? GL_SMOOTH : GL_FLAT);
-
+   
    //  Translate intensity to color vectors
-   float Ambient[]   = {0.01*ambient ,0.01*ambient ,0.01*ambient ,1.0};
-   float Diffuse[]   = {0.01*diffuse ,0.01*diffuse ,0.01*diffuse ,1.0};
-   float Specular[]  = {0.01*specular,0.01*specular,0.01*specular,1.0};
+   float Ambient[]   = {0.01f*ambient, 0.01f*ambient, 0.01f*ambient, 1.0f};
+   float Diffuse[]   = {0.01f*diffuse ,0.01f*diffuse ,0.01f*diffuse ,1.0f};
+   float Specular[]  = {0.01f*specular,0.01f*specular,0.01f*specular,1.0f};
    //  Light position
-   float Position[]  = {distance*Cos(zh),ylight,distance*Sin(zh),1.0};
+   float Position[4];
+   Position[0] = distance*Cos(zh);
+   Position[1] = ylight;
+   Position[2] = distance*Sin(zh);
+   Position[3] = 1.0;
    //  Draw light position as ball (still no lighting here)
    glColor3f(1,1,1);
    sphere(Position[0],Position[1],Position[2] , 0.1, shinyvec, emission);
