@@ -11,7 +11,7 @@
  */
 void cube(double x,double y,double z,
                  double dx,double dy,double dz,
-                 double th, const float const * shinyvec)
+                 double th, const float * const shinyvec)
 {
    //  Set specular color to white
    float white[] = {1,1,1,1};
