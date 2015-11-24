@@ -42,15 +42,15 @@ diamond.o: diamond.h diamond.cpp CSCIx229.h
 tetrahedron.o: tetrahedron.h tetrahedron.cpp CSCIx229.h
 cone.o: cone.h cone.cpp CSCIx229.h
 
-world.o: world.c world.h CSCIx229.h cube.o sphere.o triangularPrism.o tear.o torus.o cylinder.o bicycle.o diamond.o tetrahedron.o \
+world.o: world.cpp world.h CSCIx229.h cube.o sphere.o triangularPrism.o tear.o torus.o cylinder.o bicycle.o diamond.o tetrahedron.o \
 	cone.o
 
 #  Create archive
 CSCIx229.a:fatal.o loadtexbmp.o print.o project.o errcheck.o object.o
 	ar -rcs $@ $^
 
-objects.a:cube.o sphere.o triangularPrism.o tear.o torus.o cylinder.o bicycle.o diamond.o tetrahedron.o \
-	cone.o world.o
+objects.a:cube.o sphere.o triangularPrism.o tear.o torus.o cylinder.o \
+	  bicycle.o diamond.o tetrahedron.o cone.o world.o
 	ar -rcs $@ $^
 
 # Compile rules
