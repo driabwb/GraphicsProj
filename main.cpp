@@ -41,7 +41,6 @@
 #include "world.h"
 
 #include "physics.h"
-
 const int FIRST_PERSON = 2;
 
 int axes=1;       //  Display axes

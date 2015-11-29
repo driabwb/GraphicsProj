@@ -11,5 +11,4 @@ void cube(double x,double y,double z,
 	  double dx,double dy,double dz,
 	  double th, const float * const shinyvec);
 
-
 #endif

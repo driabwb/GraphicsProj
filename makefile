@@ -79,6 +79,9 @@ physics.o: physics.cpp
 main.o: main.cpp
 	g++ -c $(CFLG) -o $@ $^ $(BULLET_FLGS)
 
+world.o: world.c world.h CSCIx229.h cube.o sphere.o triangularPrism.o tear.o torus.o cylinder.o bicycle.o diamond.o tetrahedron.o \
+	cone.o
+
 #  Create archive
 CSCIx229.a:fatal.o loadtexbmp.o print.o project.o errcheck.o object.o
 	ar -rcs $@ $^
