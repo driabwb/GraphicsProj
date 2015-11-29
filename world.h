@@ -4,5 +4,6 @@
 void drawStaticWorld();
 void drawDynamicWorld();
 void drawCharacter();
+void drawSky();
 
 #endif
