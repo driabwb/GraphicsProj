@@ -6,8 +6,27 @@
 #include "cube.h"
 #include "triangularPrism.h"
 #include "cone.h"
+#include "skybox.h"
+#include "physics.h"
 
 #include "world.h"
+
+
+void drawSky(){
+  glDisable(GL_DEPTH_TEST);
+  glDepthMask(GL_FALSE);
+  
+  glPushMatrix();
+  glPushAttrib(GL_TRANSFORM_BIT|GL_ENABLE_BIT);
+
+  drawSkybox(5.0);
+
+  glPopAttrib();
+  glPopMatrix();
+
+  glEnable(GL_DEPTH_TEST);
+  glDepthMask(GL_TRUE);
+}
 
 void drawStaticWorld()
 {
@@ -38,8 +57,8 @@ void drawCharacter()
 {
   const float shinyvec[1] = {1};
   glPushMatrix();
-
-  cube(0,0,0, 0.1,0.1,0.1, 0, shinyvec);
+  btTransform characterTransform = worldCharacter->getWorldTransform();
+  cube(getXFromBullet(characterTransform),getYFromBullet(characterTransform),getZFromBullet(characterTransform), 0.2,0.2,0.2, 0, shinyvec);
   
   glPopMatrix();
 }

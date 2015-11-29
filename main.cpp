@@ -37,7 +37,10 @@
 #include "diamond.h"
 #include "tetrahedron.h"
 #include "cone.h"
+#include "skybox.h"
 #include "world.h"
+
+#include "physics.h"
 
 const int FIRST_PERSON = 2;
 
@@ -104,6 +107,8 @@ void display()
 
    //  Flat or smooth shading
    glShadeModel(smooth ? GL_SMOOTH : GL_FLAT);
+
+   drawSky();
    
    //  Translate intensity to color vectors
    float Ambient[]   = {0.01f*ambient, 0.01f*ambient, 0.01f*ambient, 1.0f};
@@ -189,6 +194,7 @@ void idle()
    double t = glutGet(GLUT_ELAPSED_TIME)/1000.0;
    zh = fmod(90*t,360.0);
    //  Tell GLUT it is necessary to redisplay the scene
+   stepSim();
    glutPostRedisplay();
 }
 
@@ -345,6 +351,9 @@ int main(int argc,char* argv[])
    glutSpecialFunc(special);
    glutKeyboardFunc(key);
    glutIdleFunc(idle);
+
+   skyboxInit();
+   initBullet();
    //  Pass control to GLUT so it can interact with the user
    ErrCheck("init");
    glutMainLoop();
