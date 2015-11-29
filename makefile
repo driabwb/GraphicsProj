@@ -1,6 +1,33 @@
 # Example 13
 EXE=main
 
+# Bullet
+BULLET_FLGS=-I ./bullet3-2.83.6/headers -I ./bullet3-2.83.6/src
+BULLET_ARCHIVES=./bullet3-2.83.6/bin/libBulletDynamics_gmake_x64_release.a \
+	        ./bullet3-2.83.6/bin/libBullet3Common_gmake_x64_release.a \
+		./bullet3-2.83.6/bin/libBulletCollision_gmake_x64_release.a \
+	        ./bullet3-2.83.6/bin/libLinearMath_gmake_x64_release.a
+
+#./bullet3-2.83.6/bin/libBullet2FileLoader_gmake_x64_release.a \
+./bullet3-2.83.6/bin/libBullet3Collision_gmake_x64_release.a \
+./bullet3-2.83.6/bin/libBullet3Common_gmake_x64_release.a \
+./bullet3-2.83.6/bin/libBullet3Dynamics_gmake_x64_release.a \
+./bullet3-2.83.6/bin/libBullet3Geometry_gmake_x64_release.a \
+./bullet3-2.83.6/bin/libBullet3OpenCL_clew_gmake_x64_release.a \
+./bullet3-2.83.6/bin/libBulletCollision_gmake_x64_release.a \
+./bullet3-2.83.6/bin/libBulletDynamics_gmake_x64_release.a \
+./bullet3-2.83.6/bin/libBulletFileLoader_gmake_x64_release.a \
+./bullet3-2.83.6/bin/libBulletSoftBody_gmake_x64_release.a \
+./bullet3-2.83.6/bin/libBulletWorldImporter_gmake_x64_release.a \
+./bullet3-2.83.6/bin/libConvexDecomposition_gmake_x64_release.a \
+./bullet3-2.83.6/bin/libgtest_gmake_x64_release.a \
+./bullet3-2.83.6/bin/libgwen_gmake_x64_release.a \
+./bullet3-2.83.6/bin/libHACD_gmake_x64_release.a \
+./bullet3-2.83.6/bin/libLinearMath_gmake_x64_release.a \
+./bullet3-2.83.6/bin/libOpenGL_Window_gmake_x64_release.a
+
+
+
 # Main target
 all: $(EXE)
 
@@ -41,16 +68,23 @@ bicycle.o: bicycle.h bicycle.cpp cylinder.o torus.o
 diamond.o: diamond.h diamond.cpp CSCIx229.h
 tetrahedron.o: tetrahedron.h tetrahedron.cpp CSCIx229.h
 cone.o: cone.h cone.cpp CSCIx229.h
+skybox.o: skybox.h skybox.cpp CSCIx229.h
 
-world.o: world.cpp world.h CSCIx229.h cube.o sphere.o triangularPrism.o tear.o torus.o cylinder.o bicycle.o diamond.o tetrahedron.o \
-	cone.o
+world.o: world.cpp world.h CSCIx229.h cube.o sphere.o triangularPrism.o tear.o torus.o cylinder.o \
+	bicycle.o diamond.o tetrahedron.o cone.o skybox.o
+	g++ -c $(CFLG) $< $(BULLET_FLGS)
+
+physics.o: physics.cpp
+	g++ -c $(CFLG) -o $@ $^ $(BULLET_FLGS)
+main.o: main.cpp
+	g++ -c $(CFLG) -o $@ $^ $(BULLET_FLGS)
 
 #  Create archive
 CSCIx229.a:fatal.o loadtexbmp.o print.o project.o errcheck.o object.o
 	ar -rcs $@ $^
 
 objects.a:cube.o sphere.o triangularPrism.o tear.o torus.o cylinder.o \
-	  bicycle.o diamond.o tetrahedron.o cone.o world.o
+	  bicycle.o diamond.o tetrahedron.o cone.o skybox.o world.o
 	ar -rcs $@ $^
 
 # Compile rules
@@ -60,8 +94,8 @@ objects.a:cube.o sphere.o triangularPrism.o tear.o torus.o cylinder.o \
 	g++ -c $(CFLG) $<
 
 #  Link
-main:main.o CSCIx229.a objects.a
-	g++ -O3 -o $@ $^   $(LIBS)
+main:main.o objects.a physics.o CSCIx229.a 
+	g++ -O3 -o $@ $^   $(LIBS) $(BULLET_ARCHIVES)
 
 #  Clean
 clean:
@@ -70,3 +104,6 @@ clean:
 # Clean and make
 cleanmake: clean main
 
+# Get and build bullet
+bullet:
+	./bScript.sh
