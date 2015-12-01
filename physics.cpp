@@ -52,7 +52,6 @@ void initBullet(){
 
   dynamicsWorld = new btDiscreteDynamicsWorld(dispatcher,overlappingPairCache,solver,collisionConfiguration);
 
-  
   // Sets the gravity for the world. Note that bullet does not have the general rotation I set up for the Graphics thus up = positive y
   dynamicsWorld->setGravity(btVector3(0,-10,0));
 

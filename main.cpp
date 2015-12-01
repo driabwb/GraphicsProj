@@ -219,7 +219,6 @@ void special(int key,int x,int y)
       move.setZ(-100*Sin(-fpth));
     }
     worldCharacter->applyCentralForce(move);
-    
   }
   else{
     //  Right arrow key - increase angle by 5 degrees

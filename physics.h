@@ -60,5 +60,4 @@ static const int numTriangularPrisms = 4;
 extern btCollisionShape* triangularPrismShapes[1];
 extern btRigidBody* triangularPrisms[numTriangularPrisms];
 
-
 #endif
