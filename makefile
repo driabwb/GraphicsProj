@@ -8,26 +8,6 @@ BULLET_ARCHIVES=./bullet3-2.83.6/bin/libBulletDynamics_gmake_x64_release.a \
 		./bullet3-2.83.6/bin/libBulletCollision_gmake_x64_release.a \
 	        ./bullet3-2.83.6/bin/libLinearMath_gmake_x64_release.a
 
-#./bullet3-2.83.6/bin/libBullet2FileLoader_gmake_x64_release.a \
-./bullet3-2.83.6/bin/libBullet3Collision_gmake_x64_release.a \
-./bullet3-2.83.6/bin/libBullet3Common_gmake_x64_release.a \
-./bullet3-2.83.6/bin/libBullet3Dynamics_gmake_x64_release.a \
-./bullet3-2.83.6/bin/libBullet3Geometry_gmake_x64_release.a \
-./bullet3-2.83.6/bin/libBullet3OpenCL_clew_gmake_x64_release.a \
-./bullet3-2.83.6/bin/libBulletCollision_gmake_x64_release.a \
-./bullet3-2.83.6/bin/libBulletDynamics_gmake_x64_release.a \
-./bullet3-2.83.6/bin/libBulletFileLoader_gmake_x64_release.a \
-./bullet3-2.83.6/bin/libBulletSoftBody_gmake_x64_release.a \
-./bullet3-2.83.6/bin/libBulletWorldImporter_gmake_x64_release.a \
-./bullet3-2.83.6/bin/libConvexDecomposition_gmake_x64_release.a \
-./bullet3-2.83.6/bin/libgtest_gmake_x64_release.a \
-./bullet3-2.83.6/bin/libgwen_gmake_x64_release.a \
-./bullet3-2.83.6/bin/libHACD_gmake_x64_release.a \
-./bullet3-2.83.6/bin/libLinearMath_gmake_x64_release.a \
-./bullet3-2.83.6/bin/libOpenGL_Window_gmake_x64_release.a
-
-
-
 # Main target
 all: $(EXE)
 
@@ -74,10 +54,10 @@ world.o: world.cpp world.h CSCIx229.h cube.o sphere.o triangularPrism.o tear.o t
 	bicycle.o diamond.o tetrahedron.o cone.o skybox.o
 	g++ -c $(CFLG) $< $(BULLET_FLGS)
 
-physics.o: physics.cpp
-	g++ -c $(CFLG) -o $@ $^ $(BULLET_FLGS)
-main.o: main.cpp
-	g++ -c $(CFLG) -o $@ $^ $(BULLET_FLGS)
+physics.o: physics.cpp 2.83.6.zip
+	g++ -c $(CFLG) -o $@ $< $(BULLET_FLGS)
+main.o: main.cpp 2.83.6.zip
+	g++ -c $(CFLG) -o $@ $< $(BULLET_FLGS)
 
 #  Create archive
 CSCIx229.a:fatal.o loadtexbmp.o print.o project.o errcheck.o object.o
@@ -100,10 +80,15 @@ main:main.o objects.a physics.o CSCIx229.a
 #  Clean
 clean:
 	$(CLEAN)
+cleanall: clean cleanBullet
 
 # Clean and make
 cleanmake: clean main
 
 # Get and build bullet
+2.83.6.zip: bullet
 bullet:
 	./bScript.sh
+
+cleanBullet:
+	rm -rf bullet3-2.83.6 2.83.6.zip

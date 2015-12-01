@@ -1,28 +1,6 @@
 /*
- *  Lighting
- *
- *  Demonstrates basic lighting using a sphere and a cube.
- *
- *  Key bindings:
- *  a/A        Decrease/increase ambient light
- *  d/D        Decrease/increase diffuse light
- *  s/S        Decrease/increase specular light
- *  e/E        Decrease/increase emitted light
- *  n/N        Decrease/increase shininess
- *  F1         Toggle smooth/flat shading
- *  F2         Toggle local viewer mode
- *  F3         Toggle light distance (1/5)
- *  F8         Change ball increment
- *  F9         Invert bottom normal
- *  m          Toggles light movement
- *  []         Lower/rise light
- *  p          Toggles ortogonal/perspective projection
- *  +/-        Change field of view of perspective
- *  x          Toggle axes
- *  arrows     Change view angle
- *  PgDn/PgUp  Zoom in and out
- *  0          Reset view angle
- *  ESC        Exit
+ *  Final Project
+ *  
  */
 #include "CSCIx229.h"
 
@@ -43,30 +21,32 @@
 #include "physics.h"
 
 const int FIRST_PERSON = 2;
+int fpth = 0;
 
 int axes=1;       //  Display axes
-int mode=1;       //  Projection mode
+int mode=2;       //  Projection mode
 int move=1;       //  Move light
 int th=0;         //  Azimuth of view angle
 int ph=0;         //  Elevation of view angle
 int fov=55;       //  Field of view (for perspective)
 int light=1;      //  Lighting
 double asp=1;     //  Aspect ratio
-double dim=3.0;   //  Size of world
+double dim=50.0;  //  Size of world
+int lightFollow=0;//  Should the light follow the character
 // Light values
 int one       =   1;  // Unit value
-int distance  =   5;  // Light distance
+int distance  =  15;  // Light distance
 int inc       =  10;  // Ball increment
 int smooth    =   1;  // Smooth/Flat shading
 int local     =   0;  // Local Viewer Model
 int emission  =   0;  // Emission intensity (%)
-int ambient   =  0; //30;  // Ambient intensity (%)
+int ambient   =   5;  // Ambient intensity (%)
 int diffuse   = 100;  // Diffuse intensity (%)
 int specular  =   0;  // Specular intensity (%)
 int shininess =   0;  // Shininess (power of two)
 float shinyvec[1];    // Shininess (value)
 int zh        =  90;  // Light azimuth
-float ylight  =   0;  // Elevation of light
+float ylight  =   3;  // Elevation of light
 
 int i=0, o=0, p=0;
 
@@ -81,7 +61,8 @@ int i=0, o=0, p=0;
  */
 void display()
 {
-   const double len=2.0;  //  Length of axes
+  double lightFollowPos[3] = {0,0,0};
+  const double len=2.0;  //  Length of axes
    //  Erase the window and the depth buffer
    glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
    //  Enable Z-buffering in OpenGL
@@ -91,7 +72,24 @@ void display()
    //  Undo previous transformations
    glLoadIdentity();
    //  Perspective - set eye position
-   if (mode)
+   if (mode == FIRST_PERSON){
+     double dist = 3;
+     btTransform characterTransform = worldCharacter->getWorldTransform();
+     double x = characterTransform.getOrigin().getX();
+     double y = characterTransform.getOrigin().getY();
+     double z = characterTransform.getOrigin().getZ();
+  
+     double Ex = x-dist*Cos(fpth);
+     double Ey = y+1;
+     double Ez = z+dist*Sin(fpth);
+
+     lightFollowPos[0] = Ex;
+     lightFollowPos[1] = Ey+1;
+     lightFollowPos[2] = Ez;
+
+     gluLookAt(Ex,Ey,Ez, x,y,z, 0, Cos(ph),0);
+   }
+   else if (mode)
    {
       double Ex = -2*dim*Sin(th)*Cos(ph);
       double Ey = +2*dim        *Sin(ph);
@@ -116,10 +114,17 @@ void display()
    float Specular[]  = {0.01f*specular,0.01f*specular,0.01f*specular,1.0f};
    //  Light position
    float Position[4];
-   Position[0] = distance*Cos(zh);
-   Position[1] = ylight;
-   Position[2] = distance*Sin(zh);
-   Position[3] = 1.0;
+   if(lightFollow){
+     Position[0] = lightFollowPos[0];
+     Position[1] = lightFollowPos[1];
+     Position[2] = lightFollowPos[2];
+     Position[3] = 1.0;
+   }else{
+     Position[0] = distance*Cos(zh);
+     Position[1] = ylight;
+     Position[2] = distance*Sin(zh);
+     Position[3] = 1.0;
+   }
    //  Draw light position as ball (still no lighting here)
    glColor3f(1,1,1);
    sphere(Position[0],Position[1],Position[2] , 0.1, shinyvec, emission);
@@ -167,18 +172,6 @@ void display()
       Print("Z");
    }
 
-   //  Display parameters
-   glWindowPos2i(5,5);
-   Print("Angle=%d,%d  Dim=%.1f FOV=%d Projection=%s Light=%s",
-     th,ph,dim,fov,mode?"Perpective":"Orthogonal",light?"On":"Off");
-   if (light)
-   {
-      glWindowPos2i(5,45);
-      Print("Model=%s LocalViewer=%s Distance=%d Elevation=%.1f",smooth?"Smooth":"Flat",local?"On":"Off",distance,ylight);
-      glWindowPos2i(5,25);
-      Print("Ambient=%d  Diffuse=%d Specular=%d Emission=%d Shininess=%.0f",ambient,diffuse,specular,emission,shinyvec[0]);
-   }
-
    //  Render the scene and make it visible
    ErrCheck("display");
    glFlush();
@@ -204,20 +197,29 @@ void idle()
 void special(int key,int x,int y)
 {
   if(mode == FIRST_PERSON){
+    btVector3 move(0,0,0);
     // Turn character right
-    if (key == GLUT_KEY_RIGHT)
-      th += 5;
+    if (key == GLUT_KEY_RIGHT){
+      move.setZ(100*Cos(fpth));
+      move.setX(100*Sin(fpth));
+    }
     // Turn character left
-    else if (key == GLUT_KEY_LEFT)
-      th -= 5;
+    else if (key == GLUT_KEY_LEFT){
+      move.setZ(-100*Cos(fpth));
+      move.setX(-100*Sin(fpth));
+    }
     //  Move forward
-    else if (key == GLUT_KEY_UP)
-      ph += 5;
+    else if (key == GLUT_KEY_UP){
+      move.setX(100*Cos(-fpth));
+      move.setZ(100*Sin(-fpth));
+    }
     //  Move backward
-    else if (key == GLUT_KEY_DOWN)
-      ph -= 5;
+    else if (key == GLUT_KEY_DOWN){
+      move.setX(-100*Cos(-fpth));
+      move.setZ(-100*Sin(-fpth));
+    }
+    worldCharacter->applyCentralForce(move);
     
-
   }
   else{
     //  Right arrow key - increase angle by 5 degrees
@@ -242,6 +244,7 @@ void special(int key,int x,int y)
   //  Keep angles to +/-360 degrees
   th %= 360;
   ph %= 360;
+  fpth %= 360;
   //  Update projection
   Project(mode?fov:0,asp,dim);
   //  Tell GLUT it is necessary to redisplay the scene
@@ -262,20 +265,6 @@ void key(unsigned char ch,int x,int y)
    //  Toggle axes
    else if (ch == 'x' || ch == 'X')
       axes = 1-axes;
-   //  Toggle lighting
-   else if (ch == 'l' || ch == 'L')
-      light = 1-light;
-   //  Switch projection mode
-   else if (ch == 'p' || ch == 'P')
-      mode = 1-mode;
-   //  Toggle light movement
-   else if (ch == 'm' || ch == 'M')
-      move = 1-move;
-   //  Move light
-   else if (ch == '<')
-      zh += 1;
-   else if (ch == '>')
-      zh -= 1;
    //  Change field of view angle
    else if (ch == '-' && ch>1)
       fov--;
@@ -286,31 +275,27 @@ void key(unsigned char ch,int x,int y)
       ylight -= 0.1;
    else if (ch==']')
       ylight += 0.1;
-   //  Ambient level
-   else if (ch=='a' && ambient>0)
-      ambient -= 5;
-   else if (ch=='A' && ambient<100)
-      ambient += 5;
-   //  Diffuse level
-   else if (ch=='d' && diffuse>0)
-      diffuse -= 5;
-   else if (ch=='D' && diffuse<100)
-      diffuse += 5;
-   //  Specular level
-   else if (ch=='s' && specular>0)
-      specular -= 5;
-   else if (ch=='S' && specular<100)
-      specular += 5;
-   //  Emission level
-   else if (ch=='e' && emission>0)
-      emission -= 5;
-   else if (ch=='E' && emission<100)
-      emission += 5;
-   //  Shininess level
-   else if (ch=='n' && shininess>-1)
-      shininess -= 1;
-   else if (ch=='N' && shininess<7)
-      shininess += 1;
+   //Switch between first person and not
+   else if (ch=='f' || ch=='F')
+     mode= mode==2?1:2;
+   // rotate in FP
+   else if ('a' == ch || 'A' == ch){
+     btVector3 vert(0,1,0);
+     fpth+=5;
+   }
+   else if ('d' == ch || 'D' == ch){
+     btVector3 vert(0,1,0);
+     fpth-=5;
+   }
+   // Should the light follow the player
+   else if ('l' == ch || 'L' == ch){
+     lightFollow = 1 - lightFollow;
+   }
+   // light circle radius
+   else if ('k' == ch || 'K' == ch){
+     distance = 5==distance?15:
+       15==distance?30:5;
+   }
    //  Translate shininess power to value (-1 => 0)
    shinyvec[0] = shininess<0 ? 0 : pow(2.0,shininess);
    //  Reproject
