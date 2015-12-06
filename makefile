@@ -54,7 +54,9 @@ world.o: world.cpp world.h CSCIx229.h cube.o sphere.o triangularPrism.o tear.o t
 	bicycle.o diamond.o tetrahedron.o cone.o skybox.o
 	g++ -c $(CFLG) $< $(BULLET_FLGS)
 
-physics.o: physics.cpp 2.83.6.zip
+GLDebugDrawer.o: GLDebugDrawer.cpp 2.83.6.zip
+	g++ -c $(CFLG) -o $@ $< $(BULLET_FLGS)
+physics.o: physics.cpp GLDebugDrawer.o 2.83.6.zip
 	g++ -c $(CFLG) -o $@ $< $(BULLET_FLGS)
 main.o: main.cpp 2.83.6.zip
 	g++ -c $(CFLG) -o $@ $< $(BULLET_FLGS)
@@ -74,7 +76,7 @@ objects.a:cube.o sphere.o triangularPrism.o tear.o torus.o cylinder.o \
 	g++ -c $(CFLG) $<
 
 #  Link
-main:main.o objects.a physics.o CSCIx229.a 
+main:main.o objects.a physics.o GLDebugDrawer.o CSCIx229.a 
 	g++ -O3 -o $@ $^   $(LIBS) $(BULLET_ARCHIVES)
 
 #  Clean
