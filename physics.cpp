@@ -2,12 +2,13 @@
 
 
 #include "physics.h"
+#include "GLDebugDrawer.h"
 
 static btDefaultCollisionConfiguration* collisionConfiguration;
 static btCollisionDispatcher* dispatcher;
 static btBroadphaseInterface* overlappingPairCache;
 static btSequentialImpulseConstraintSolver* solver;
-static btDiscreteDynamicsWorld* dynamicsWorld;
+btDiscreteDynamicsWorld* dynamicsWorld;
 
 btCollisionShape* worldGroundShape;
 btRigidBody* worldGround;
@@ -25,7 +26,7 @@ btRigidBody* bicycles[numBicycles];
 btCollisionShape* cylinderShapes[2];
 btRigidBody* cylinders[numCylinders];
 
-btCollisionShape* boxShapes[4];
+btCollisionShape* boxShapes[5];
 btRigidBody* boxes[numBoxes];
 
 btCollisionShape* sphereShapes[2];
@@ -51,6 +52,14 @@ void initBullet(){
   solver = new btSequentialImpulseConstraintSolver;
 
   dynamicsWorld = new btDiscreteDynamicsWorld(dispatcher,overlappingPairCache,solver,collisionConfiguration);
+  if(dynamicsWorld->getDebugDrawer()==NULL){
+    btIDebugDraw* debugDrawer = new GLDebugDrawer();
+    dynamicsWorld->setDebugDrawer(debugDrawer);
+  }
+  dynamicsWorld->getDebugDrawer()->setDebugMode(btIDebugDraw::DBG_DrawWireframe);
+  
+  fflush(stdout);
+  //dynamicsWorld->getDebugDrawer()->setDebugMode(btIDebugDraw::DBG_DrawWireframe);
 
   // Sets the gravity for the world. Note that bullet does not have the general rotation I set up for the Graphics thus up = positive y
   dynamicsWorld->setGravity(btVector3(0,-10,0));
@@ -79,8 +88,9 @@ void createStaticObjects(){
   worldGround = createRigidBody(worldGroundShape, mass, btVector3(0,0,0));
 
   // Create triangular bases
-  btQuaternion worldRotation(btVector3(1,0,0), -90);
-
+  btQuaternion worldRotation(btVector3(1,0,0), -90*PI/180.0);
+  btQuaternion rot180(btVector3(0,0,1), 180*PI/180.0);
+  btQuaternion fullRot(0,0.7,0.7,0);
   triangularBaseShape1 = triangularPrismShape(1,1.3,1.2);
   transform.setIdentity();
   transform.setOrigin(btVector3(2,0,2.5));
@@ -93,7 +103,7 @@ void createStaticObjects(){
   triangularBaseShape2 = triangularPrismShape(1,1.3,1);
   transform.setIdentity();
   transform.setOrigin(btVector3(2,0,-4.5));
-  transform.setRotation(worldRotation);
+  transform.setRotation(fullRot);
 
   myMotionState = new btDefaultMotionState(transform);
   btRigidBody::btRigidBodyConstructionInfo rbInfo2(mass,myMotionState,triangularBaseShape2,localInertia);
@@ -113,16 +123,18 @@ void createStaticObjects(){
   boxShapes[1] = new btBoxShape(btVector3(21,1,0.5));
   boxShapes[2] = new btBoxShape(btVector3(0.5,1,21)); // left and right bounding walls
   boxShapes[3] = new btBoxShape(btVector3(0.5,1,21));
+  boxShapes[4] = new btBoxShape(btVector3(1,0.25,3));
 
   boxes[0] = createRigidBody(boxShapes[0], mass, btVector3(0,0,20.5));
   boxes[1] = createRigidBody(boxShapes[1], mass, btVector3(0,0,-20.5));
   boxes[2] = createRigidBody(boxShapes[2], mass, btVector3(20.5,0,0));
   boxes[3] = createRigidBody(boxShapes[3], mass, btVector3(-20.5,0,0));
+  boxes[4] = createRigidBody(boxShapes[4], mass, btVector3(2,1,-1));
   
   // Create a bicycle
   bicycleShapes[0] = bicycleShape();
 
-  bicycles[0] = createRigidBody(bicycleShapes[0], mass, btVector3(2,3.5,0));
+  bicycles[0] = createRigidBody(bicycleShapes[0], mass, btVector3(2,3.5,0), 90);
   bicycles[1] = createRigidBody(bicycleShapes[0], mass, btVector3(-15,1,-15));
   
   // The scene's spheres
@@ -152,12 +164,17 @@ void createStaticObjects(){
   cones[7] = createRigidBody(coneShapes[0], mass, btVector3(-15,0.5,-5));
 
   // Triangular Prisms
+  btQuaternion triangularPrismRot(btVector3(1,0,0), 150*PI/180.0);
   triangularPrismShapes[0] = triangularPrismShape(1,1,1);
 
   triangularPrisms[0] = createRigidBody(triangularPrismShapes[0], mass, btVector3(5,0,15));
   triangularPrisms[1] = createRigidBody(triangularPrismShapes[0], mass, btVector3(-5,0,15));
   triangularPrisms[2] = createRigidBody(triangularPrismShapes[0], mass, btVector3(5,0,-15));
   triangularPrisms[3] = createRigidBody(triangularPrismShapes[0], mass, btVector3(-5,0,-15));
+
+  for(int i = 0; i<numTriangularPrisms; i++){
+    triangularPrisms[i]->getWorldTransform().setRotation(triangularPrismRot);
+  }
   
   //add the bodies to the dynamics world
   dynamicsWorld->addRigidBody(worldGround);
@@ -202,7 +219,7 @@ void createDynamicObjects(){
   btDefaultMotionState* myMotionState;
   
   // Create the player construct
-  worldCharacterShape = new btBoxShape(btVector3(0.1, 0.1, 0.1));
+  worldCharacterShape = new btBoxShape(btVector3(0.2, 0.2, 0.2));
   btTransform characterTransform;
   characterTransform.setIdentity();
   characterTransform.setOrigin(btVector3(0,5,0));
@@ -212,17 +229,29 @@ void createDynamicObjects(){
   //using motionstate is recommended, it provides interpolation capabilities, and only synchronizes 'active' objects
   myMotionState = new btDefaultMotionState(characterTransform);
   btRigidBody::btRigidBodyConstructionInfo rbInfo(mass,myMotionState,worldCharacterShape,localInertia);
-  rbInfo.m_linearDamping = 0.2;
+  rbInfo.m_linearDamping = 0.5;
   worldCharacter = new btRigidBody(rbInfo);
   worldCharacter->setActivationState(DISABLE_DEACTIVATION);
   dynamicsWorld->addRigidBody(worldCharacter);
   
 }
 
+bool isCharacterOnObject(){
+
+
+  btTransform transform = worldCharacter->getWorldTransform();
+  btVector3 from(transform.getOrigin().getX(), transform.getOrigin().getY(), transform.getOrigin().getZ());
+  btVector3 to = from - btVector3(0,0.3, 0);
+  btCollisionWorld::ClosestRayResultCallback res(from, to);
+
+  dynamicsWorld->rayTest(from,to,res);
+
+  return res.hasHit();
+}
 
 void stepSim(){
   dynamicsWorld->stepSimulation(1.f/60.f,10);
-  dynamicsWorld->debugDrawWorld();
+
   /*
     For Additional Debugging information
 
@@ -241,8 +270,6 @@ void stepSim(){
   }
   */
 
-  //printf("Forces: (%f, %f, %f)\nActivation State: %i", force.getX(), force.getY(), force.getZ(), body->getActivationState());
-  
 }
 
 btConvexHullShape* triangularPrismShape(double sx=1.0, double sy=1.0, double sz=1.0){
@@ -251,9 +278,16 @@ btConvexHullShape* triangularPrismShape(double sx=1.0, double sy=1.0, double sz=
   prism->addPoint(pt1);
   prism->addPoint(pt2);
   prism->addPoint(pt3);
+  prism->addPoint(pt6);
   prism->addPoint(pt4);
   prism->addPoint(pt5);
   prism->addPoint(pt6);
+  prism->addPoint(pt5);
+  prism->addPoint(pt2);
+  prism->addPoint(pt5);
+  prism->addPoint(pt4);
+  prism->addPoint(pt1);
+  prism->addPoint(pt3);
 
   btVector3 scaling(sx,sz,sy);
   prism->setLocalScaling(scaling);
@@ -263,25 +297,27 @@ btConvexHullShape* triangularPrismShape(double sx=1.0, double sy=1.0, double sz=
 
 btCompoundShape* bicycleShape(){
   btCompoundShape* bicycle = new btCompoundShape();
-  btCylinderShapeZ* frontWheel = new btCylinderShapeZ(btVector3(3/2,3/2,0.125));
-  btCylinderShapeZ* backWheel = new btCylinderShapeZ(btVector3(1/2,1/2,0.125));
+  btCylinderShapeZ* frontWheel = new btCylinderShapeZ(btVector3(1.6,1.6,0.125));
+  btCylinderShapeZ* backWheel = new btCylinderShapeZ(btVector3(0.5,0.5,0.125));
   //btBoxShape* handlebars = new btBoxShape(bvVector());
   btTransform transform;
   transform.setIdentity();
   transform.setOrigin(btVector3(0,0,0));
   bicycle->addChildShape(transform, frontWheel);
   transform.setIdentity();
-  transform.setOrigin(btVector3(4.75742/2,0,0));
+  transform.setOrigin(btVector3(4.75742/2,-1,0));
   bicycle->addChildShape(transform, backWheel);
 
   return bicycle;
 }
 
-btRigidBody* createRigidBody(btCollisionShape* shape, float mass, btVector3 pos){
+btRigidBody* createRigidBody(btCollisionShape* shape, float mass, btVector3 pos, double ry){
   btVector3 localInertia(0,0,0);
   btTransform transform;
   transform.setIdentity();
   transform.setOrigin(pos);
+  btQuaternion rot(btVector3(0,1,0), ry*PI/180.0);
+  transform.setRotation(rot);
   btDefaultMotionState* myMotionState = new btDefaultMotionState(transform);
   btRigidBody::btRigidBodyConstructionInfo rbInfo(mass,myMotionState,shape,localInertia);
   return new btRigidBody(rbInfo);

@@ -23,6 +23,12 @@
 const int FIRST_PERSON = 2;
 int fpth = 0;
 
+const int COLLISION_BOXES = 0;
+const int OBJECTS = 1;
+const int COLLISION_BOXES_AND_OBJECTS = 2;
+
+int drawMode = 2;
+
 int axes=1;       //  Display axes
 int mode=2;       //  Projection mode
 int move=1;       //  Move light
@@ -144,12 +150,17 @@ void display()
    glLightfv(GL_LIGHT0,GL_DIFFUSE ,Diffuse);
    glLightfv(GL_LIGHT0,GL_SPECULAR,Specular);
    glLightfv(GL_LIGHT0,GL_POSITION,Position);
-   
-
+      
    //  Draw scene
-   drawStaticWorld();
-   drawDynamicWorld();
+   if(OBJECTS == drawMode || COLLISION_BOXES_AND_OBJECTS == drawMode){
+     drawStaticWorld();
+     drawDynamicWorld();
+   }
 
+   if(COLLISION_BOXES == drawMode || COLLISION_BOXES_AND_OBJECTS == drawMode){
+     dynamicsWorld->debugDrawWorld();
+   }
+   
    //  Draw axes - no lighting from here on
    glDisable(GL_LIGHTING);
    glColor3f(1,1,1);
@@ -218,7 +229,8 @@ void special(int key,int x,int y)
       move.setX(-100*Cos(-fpth));
       move.setZ(-100*Sin(-fpth));
     }
-    worldCharacter->applyCentralForce(move);
+    if(isCharacterOnObject())
+      worldCharacter->applyCentralForce(move);
   }
   else{
     //  Right arrow key - increase angle by 5 degrees
@@ -294,6 +306,30 @@ void key(unsigned char ch,int x,int y)
    else if ('k' == ch || 'K' == ch){
      distance = 5==distance?15:
        15==distance?30:5;
+   }
+   else if ('m' == ch || 'M' == ch){
+     switch(drawMode){
+     case COLLISION_BOXES:
+       drawMode = OBJECTS;
+       break;
+     case OBJECTS:
+       drawMode = COLLISION_BOXES_AND_OBJECTS;
+       break;
+     case COLLISION_BOXES_AND_OBJECTS:
+       drawMode = COLLISION_BOXES;
+       break;
+     default:
+       Fatal("Unknown Draw Mode.");
+     }
+   }
+   else if('r' == ch || 'R' == ch){
+     btTransform start;
+     start.setIdentity();
+     start.setOrigin(btVector3(0,5,0));
+     worldCharacter->setWorldTransform(start);
+     worldCharacter->setLinearVelocity(btVector3(0,0,0));
+     worldCharacter->setAngularVelocity(btVector3(0,0,0));
+     
    }
    //  Translate shininess power to value (-1 => 0)
    shinyvec[0] = shininess<0 ? 0 : pow(2.0,shininess);

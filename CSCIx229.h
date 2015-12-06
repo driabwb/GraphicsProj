@@ -20,6 +20,10 @@
 #define Cos(th) cos(3.1415926f/180*(th))
 #define Sin(th) sin(3.1415926f/180*(th))
 
+#ifndef PI
+#define PI 3.1414926f
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif

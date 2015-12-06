@@ -13,17 +13,22 @@
 #define getYToBullet(x,y,z) z
 #define getZToBullet(x,y,z) -y
 
+#ifndef PI
+#define PI 3.1415926f
+#endif
 // Functions
 void initBullet();
 void createSceneObjects();
 void createStaticObjects();
 void createDynamicObjects();
+bool isCharacterOnObject();
 void stepSim();
 void cleanUp();
 
+
 btConvexHullShape* triangularPrismShape(double sx, double sy, double sz);
 btCompoundShape* bicycleShape();
-btRigidBody* createRigidBody(btCollisionShape* shape, float mass, btVector3 pos);
+btRigidBody* createRigidBody(btCollisionShape* shape, float mass, btVector3 pos, double ry = 0.0);
 
 // Objects
 extern btCollisionShape* worldGroundShape;
@@ -44,8 +49,8 @@ static const int numCylinders = 2;
 extern btCollisionShape* cylinderShapes[2];
 extern btRigidBody* cylinders[numCylinders];
 
-static const int numBoxes = 4;
-extern btCollisionShape* boxShapes[4];
+static const int numBoxes = 5;
+extern btCollisionShape* boxShapes[5];
 extern btRigidBody* boxes[numBoxes];
 
 static const int numSpheres = 8;
@@ -59,5 +64,7 @@ extern btRigidBody* cones[numCones];
 static const int numTriangularPrisms = 4;
 extern btCollisionShape* triangularPrismShapes[1];
 extern btRigidBody* triangularPrisms[numTriangularPrisms];
+
+extern btDiscreteDynamicsWorld* dynamicsWorld;
 
 #endif

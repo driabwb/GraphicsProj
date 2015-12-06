@@ -113,33 +113,33 @@ void drawStaticWorld()
   
   // Cones
   getCoordinates(cones[0]->getWorldTransform(), coord);
-  cone(coord[0],coord[1],coord[2]-1, 0,0,0, 1,1,1);
+  cone(coord[0],coord[1],coord[2]-0.5, 0,0,0, 1,1,1);
   getCoordinates(cones[1]->getWorldTransform(), coord);
-  cone(coord[0],coord[1],coord[2]-1, 0,0,0, 1,1,1);
+  cone(coord[0],coord[1],coord[2]-0.5, 0,0,0, 1,1,1);
   getCoordinates(cones[2]->getWorldTransform(), coord);
-  cone(coord[0],coord[1],coord[2]-1, 0,0,0, 1,1,1);
+  cone(coord[0],coord[1],coord[2]-0.5, 0,0,0, 1,1,1);
   getCoordinates(cones[3]->getWorldTransform(), coord);
-  cone(coord[0],coord[1],coord[2]-1, 0,0,0, 1,1,1);
+  cone(coord[0],coord[1],coord[2]-0.5, 0,0,0, 1,1,1);
   getCoordinates(cones[4]->getWorldTransform(), coord);
   cone(coord[0],coord[1],coord[2]-1, 0,0,0, 1,1,2);
   getCoordinates(cones[5]->getWorldTransform(), coord);
   cone(coord[0],coord[1],coord[2]-1, 0,0,0, 1,1,2);
   getCoordinates(cones[6]->getWorldTransform(), coord);
-  cone(coord[0],coord[1],coord[2]-1, 0,0,0, 1,1,1);
+  cone(coord[0],coord[1],coord[2]-0.5, 0,0,0, 1,1,1);
   getCoordinates(cones[7]->getWorldTransform(), coord);
-  cone(coord[0],coord[1],coord[2]-1, 0,0,0, 1,1,1);
+  cone(coord[0],coord[1],coord[2]-0.5, 0,0,0, 1,1,1);
 
   glColor3f(1,0,1);
   
   // Triangular Prisms
   getCoordinates(triangularPrisms[0]->getWorldTransform(), coord);
-  triangularPrism(coord[0],coord[1],coord[2], -90,180,0, 1,1,1, shinyvec);
+  triangularPrism(coord[0],coord[1]+0.5,coord[2], -90,180,0, 1,1,1, shinyvec);
   getCoordinates(triangularPrisms[1]->getWorldTransform(), coord);
-  triangularPrism(coord[0],coord[1],coord[2], -90,180,0, 1,1,1, shinyvec);
+  triangularPrism(coord[0],coord[1]+0.5,coord[2], -90,180,0, 1,1,1, shinyvec);
   getCoordinates(triangularPrisms[2]->getWorldTransform(), coord);
-  triangularPrism(coord[0],coord[1],coord[2], -90,180,0, 1,1,1, shinyvec);
+  triangularPrism(coord[0],coord[1]+0.5,coord[2], -90,180,0, 1,1,1, shinyvec);
   getCoordinates(triangularPrisms[3]->getWorldTransform(), coord);
-  triangularPrism(coord[0],coord[1],coord[2], -90,180,0, 1,1,1, shinyvec);
+  triangularPrism(coord[0],coord[1]+0.5,coord[2], -90,180,0, 1,1,1, shinyvec);
   
   glColor3f(1,1,1);
   glPopMatrix();
