@@ -30,6 +30,8 @@ Key bindings:
  f/F	    Toggle between first person and a global view
  l/L	    Toggle having the light follow the character and rotate in a circle
  k/K	    Rotate between the radius of the lights circle (5,15,30)
+ m/M	    Rotate through viewing modes (Collision boxes, GL objects, and both)
+ r/R	    Reset the character to the inital state
  0          Reset view angle
  ESC        Exit
 
