@@ -6,10 +6,7 @@ CSCI5229 Fall 2015
 A scene using Bullet physics based upon the cube video game youtube video. (https://www.youtube.com/watch?v=4aGDCE6Nrz0)
 
 Time for Completion
-  About 60 hours, so far
-
-Remaining Work:
-  More work on correcting collision objects and the potential for shadows.
+  About 60-70 hours
 
 Build:
 	make			Builds everything
