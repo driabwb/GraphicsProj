@@ -5,6 +5,9 @@ CSCI5229 Fall 2015
 
 A scene using Bullet physics based upon the cube video game youtube video. (https://www.youtube.com/watch?v=4aGDCE6Nrz0)
 
+Highlights:
+  Looking at the collision box only view is interesting and it is now more difficult (although not impossible) to escape the box.
+
 Time for Completion
   About 60-70 hours
 

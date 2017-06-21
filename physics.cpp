@@ -69,6 +69,49 @@ void initBullet(){
 }
 
 void cleanUp(){
+  delete collisionConfiguration;
+  delete dispatcher;
+  delete overlappingPairCache;
+  delete solver;
+  delete dynamicsWorld;
+
+  delete worldGroundShape;
+  delete worldGround;
+  delete worldCharacterShape;
+  delete worldCharacter;
+
+  delete triangularBaseShape1;
+  delete triangularBase1;
+  delete triangularBaseShape2;
+  delete triangularBase2;
+
+  delete bicycleShapes[0];
+  for(int i = 0; i < numBicycles; i++)
+    delete bicycles[i];
+
+  for(int i = 0; i < 2; i++)
+    delete cylinderShapes[i];
+  for(int i = 0; i < numCylinders; i++)
+    delete cylinders[i];
+
+  for(int i = 0; i < 5; i++)
+    delete boxShapes[i];
+  for(int i = 0; i < numBoxes; i++)
+    delete boxes[i];
+
+  for(int i = 0; i < 2; i++)
+    delete sphereShapes[i];
+  for(int i = 0; i < numSpheres; i++)
+    delete spheres[i];
+
+  for(int i = 0; i < 2; i++)
+    delete coneShapes[i];
+  for(int i = 0; i < numCones; i++)
+    delete cones[i];
+
+  delete triangularPrismShapes[0];
+  for(int i = 0; i < numTriangularPrisms; i++)
+    delete triangularPrisms[i];
   
 }
 

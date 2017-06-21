@@ -76,7 +76,7 @@ objects.a:cube.o sphere.o triangularPrism.o tear.o torus.o cylinder.o \
 	g++ -c $(CFLG) $<
 
 #  Link
-main:main.o objects.a physics.o GLDebugDrawer.o CSCIx229.a 
+main: main.o objects.a physics.o GLDebugDrawer.o CSCIx229.a 
 	g++ -O3 -o $@ $^   $(LIBS) $(BULLET_ARCHIVES)
 
 #  Clean

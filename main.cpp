@@ -27,9 +27,9 @@ const int COLLISION_BOXES = 0;
 const int OBJECTS = 1;
 const int COLLISION_BOXES_AND_OBJECTS = 2;
 
-int drawMode = 2;
+int drawMode = 1;
 
-int axes=1;       //  Display axes
+int axes=0;       //  Display axes
 int mode=2;       //  Projection mode
 int move=1;       //  Move light
 int th=0;         //  Azimuth of view angle
@@ -268,8 +268,10 @@ void special(int key,int x,int y)
 void key(unsigned char ch,int x,int y)
 {
    //  Exit on ESC
-   if (ch == 27)
-      exit(0);
+  if (ch == 27){
+    //cleanUp();
+     exit(0);
+  }
    //  Reset view angle
    else if (ch == '0')
       th = ph = 0;
